@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-ticker = "AAPL"  # 你可以改做input()俾人自訂
+ticker = "AAPL"  # 你可以自訂
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}
 response = requests.get(url, headers=headers)
