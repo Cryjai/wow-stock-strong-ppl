@@ -73,7 +73,7 @@ with open('index.html', 'w', encoding='utf-8') as f:
         img {{ max-width: 100%; }}
         table {{ border-collapse: collapse; width: 100%; }}
         th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-        th {{ background-color: #f2f2f2; }}
+        th {{ background-color: #8fb58a; }}
     </style>
 </head>
 <body>
