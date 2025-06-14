@@ -5,12 +5,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ====== 1. 自訂股票ticker ======
+
 ticker = input("輸入你想分析嘅股票（例如AAPL/TSLA/GOOG）：").upper().strip()
 if not ticker:
     ticker = "AAPL"
 
-# ====== 2. 撈Finviz新聞 ======
+
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}
 response = requests.get(url, headers=headers)
@@ -25,10 +25,9 @@ else:
     # ====== 3. TextBlob情緒分析 ======
     sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
 
-# ====== 4. 整DataFrame ======
 data = pd.DataFrame({'Headline': headlines, 'Sentiment': sentiments})
 
-# ====== 5. 畫Bar Chart ======
+
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
 plt.axhline(y=0, color='black', linestyle='-')
@@ -39,7 +38,6 @@ plt.tight_layout()
 plt.savefig('sentiment_analysis.png')
 plt.close()
 
-# ====== 6. 畫Pie Chart ======
 labels = ['正面', '中立', '負面']
 sizes = [
     sum([s > 0.1 for s in sentiments]),
