@@ -5,17 +5,30 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-ticker = "AAPL"
+# ====== 1. 自訂股票ticker ======
+ticker = input("輸入你想分析嘅股票（例如AAPL/TSLA/GOOG）：").upper().strip()
+if not ticker:
+    ticker = "AAPL"
+
+# ====== 2. 撈Finviz新聞 ======
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, 'html.parser')
 news = soup.find_all('a', class_='tab-link-news')
 headlines = [n.text for n in news]
-sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
+
+if not headlines:
+    headlines = ["冇新聞撈到，可能你打錯ticker，或者Finviz block你IP！"]
+    sentiments = [0]
+else:
+    # ====== 3. TextBlob情緒分析 ======
+    sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
+
+# ====== 4. 整DataFrame ======
 data = pd.DataFrame({'Headline': headlines, 'Sentiment': sentiments})
 
-# Bar chart
+# ====== 5. 畫Bar Chart ======
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
 plt.axhline(y=0, color='black', linestyle='-')
@@ -26,7 +39,7 @@ plt.tight_layout()
 plt.savefig('sentiment_analysis.png')
 plt.close()
 
-# Pie chart
+# ====== 6. 畫Pie Chart ======
 labels = ['正面', '中立', '負面']
 sizes = [
     sum([s > 0.1 for s in sentiments]),
@@ -40,13 +53,12 @@ plt.tight_layout()
 plt.savefig('sentiment_pie.png')
 plt.close()
 
-# Table內容
 table_rows = []
 for _, row in data.iterrows():
     table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]:.2f}</td></tr>')
 table_content = '\n'.join(table_rows)
 
-# index.html
+
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(f'''
 <!DOCTYPE html>
@@ -70,11 +82,11 @@ with open('index.html', 'w', encoding='utf-8') as f:
 </head>
 <body>
     <div class="navbar">
-        <div class="logo">Perplexity Finance</div>
+        <div class="logo">AhCry Finance</div>
         <div>AI 財經助手</div>
     </div>
     <div class="container">
-        <h1>股票新聞情緒分析</h1>
+        <h1>{ticker} 股票新聞情緒分析</h1>
         <p>用 AI 分析市場情緒，早著先機！</p>
         <img src="sentiment_analysis.png" alt="情緒分析圖">
         <img src="sentiment_pie.png" alt="情緒分布餅圖">
@@ -90,7 +102,7 @@ with open('index.html', 'w', encoding='utf-8') as f:
                 {table_content}
             </tbody>
         </table>
-        <p>Perplexity Finance - 型到震，你個friend睇到一定以為你係AI股神！</p>
+        <p>AhCry Finance - 型到震，你個friend睇到一定以為你係AI股神！</p>
     </div>
     <div class="footer">
         © 2025 AhCrySoLengLui Finance. All rights reserved.
@@ -98,4 +110,3 @@ with open('index.html', 'w', encoding='utf-8') as f:
 </body>
 </html>
 ''')
-
