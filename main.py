@@ -1,23 +1,35 @@
 import requests
 from bs4 import BeautifulSoup
 from textblob import TextBlob
-import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
 
-ticker = "AAPL"  # 你可以自訂
-url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
-headers = {'User-Agent': 'Mozilla/5.0'}
-response = requests.get(url, headers=headers)
-soup = BeautifulSoup(response.text, 'html.parser')
-news = soup.find_all('a', class_='tab-link-news')
-headlines = [n.text for n in news]
-if not headlines:
-    headlines = ["冇新聞撈到，可能你打錯ticker，或者Finviz block你IP！"]
-    sentiments = [0]
-else:
-    sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
-data = pd.DataFrame({'Headline': headlines, 'Sentiment': sentiments})
+# 輸入股票代號，唔好再冇啦
+stock_symbol = input("輸入股票代號 (e.g. AAPL): ")
+ticker = stock_symbol  # 用嚟display
+
+def fetch_news(stock_symbol):
+    url = f"https://finviz.com/quote.ashx?t={stock_symbol}"
+    headers = {'User-Agent': 'Mozilla/5.0'}
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    news_table = soup.find(id='news-table')
+    news_list = []
+    for row in news_table.findAll('tr'):
+        cols = row.findAll('td')
+        if len(cols) > 1:
+            news_list.append(cols[1].text.strip())
+    return news_list
+
+news = fetch_news(stock_symbol)
+print("即時新聞:", news)
+
+def sentiment_analysis(text):
+    blob = TextBlob(text)
+    return blob.sentiment.polarity
+
+sentiments = [sentiment_analysis(item) for item in news]
+for i, item in enumerate(news):
+    print(f"新聞 {i+1}: {item[:50]}... | 情緒分數: {sentiments[i]:.2f}")
 
 # Bar chart
 plt.figure(figsize=(10, 6))
@@ -44,10 +56,10 @@ plt.tight_layout()
 plt.savefig('sentiment_pie.png')
 plt.close()
 
-# Table內容
+# 生成Table內容（用番news同sentiments）
 table_rows = []
-for _, row in data.iterrows():
-    table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]:.2f}</td></tr>')
+for i in range(len(news)):
+    table_rows.append(f'<tr><td>{news[i][:80]}</td><td>{sentiments[i]:.2f}</td></tr>')
 table_content = '\n'.join(table_rows)
 
 # index.html
