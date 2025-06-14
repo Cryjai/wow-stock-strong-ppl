@@ -52,13 +52,12 @@ plt.title('新聞情緒分布')
 plt.savefig('sentiment_pie.png')
 plt.close()
 
-# 生成表格內容
 table_rows = []
 for _, row in data.iterrows():
     table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]}</td></tr>')
 table_content = '\n'.join(table_rows)
 
-# 寫入index.html
+# index.html
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(f'''
 <!DOCTYPE html>
