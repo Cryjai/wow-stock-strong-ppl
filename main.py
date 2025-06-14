@@ -22,13 +22,11 @@ for headline in headlines:
     blob = TextBlob(headline)
     sentiments.append(blob.sentiment.polarity)
 
-# 整DataFrame，等你可以串人
 data = pd.DataFrame({
     'Headline': headlines,
     'Sentiment': sentiments
 })
 
-# 畫圖，等你可以晒命
 import matplotlib.pyplot as plt
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
@@ -39,13 +37,11 @@ plt.ylabel('情緒分數')
 plt.savefig('sentiment_analysis.png')
 plt.close()  # 唔好彈個圖出嚟，直接save
 
-# 生成表格內容
 table_rows = []
 for _, row in data.iterrows():
     table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]}</td></tr>')
 table_content = '\n'.join(table_rows)
 
-# 寫入index.html
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(f'''
 <!DOCTYPE html>
