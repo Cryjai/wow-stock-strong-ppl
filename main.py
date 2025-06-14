@@ -53,7 +53,7 @@ with open('index.html', 'w', encoding='utf-8') as f:
 <html lang="zh-hk">
 <head>
     <meta charset="UTF-8">
-    <title>Perplexity Finance - 股票新聞情緒分析</title>
+    <title>AhCry Finance - 股票新聞情緒分析</title>
     <style>
         body {{ font-family: Arial, sans-serif; max-width: 1000px; margin: 0 auto; padding: 0; }}
         .navbar {{ background: #1a1a2e; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }}
