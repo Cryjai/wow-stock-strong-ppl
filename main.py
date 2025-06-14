@@ -5,12 +5,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 自訂股票ticker 
+# ====== 1. 自訂股票ticker ======
 ticker = input("輸入你想分析嘅股票（例如AAPL/TSLA/GOOG）：").upper().strip()
 if not ticker:
     ticker = "AAPL"
 
-# 撈Finviz新聞 
+# ====== 2. 撈Finviz新聞 ======
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}
 response = requests.get(url, headers=headers)
@@ -22,13 +22,13 @@ if not headlines:
     headlines = ["冇新聞撈到，可能你打錯ticker，或者Finviz block你IP！"]
     sentiments = [0]
 else:
-    # TextBlob情緒分析 
+    # ====== 3. TextBlob情緒分析 ======
     sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
 
-# 整DataFrame 
+# ====== 4. 整DataFrame ======
 data = pd.DataFrame({'Headline': headlines, 'Sentiment': sentiments})
 
-# 畫Bar Chart 
+# ====== 5. 畫Bar Chart ======
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
 plt.axhline(y=0, color='black', linestyle='-')
@@ -39,7 +39,7 @@ plt.tight_layout()
 plt.savefig('sentiment_analysis.png')
 plt.close()
 
-# 畫Pie Chart 
+# ====== 6. 畫Pie Chart ======
 labels = ['正面', '中立', '負面']
 sizes = [
     sum([s > 0.1 for s in sentiments]),
@@ -52,6 +52,7 @@ plt.title('新聞情緒分布')
 plt.tight_layout()
 plt.savefig('sentiment_pie.png')
 plt.close()
+
 
 table_rows = []
 for _, row in data.iterrows():
