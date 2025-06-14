@@ -5,28 +5,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 你揀邊隻股票呀大佬？
-ticker = input("輸入你想分析嘅股票（例如AAPL/TSLA/GOOG）：").upper().strip()
-if not ticker:
-    ticker = "AAPL"
-
-# 去Finviz撈新聞
+ticker = "AAPL"  # 你可以改做input()俾人自訂
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}
 response = requests.get(url, headers=headers)
 soup = BeautifulSoup(response.text, 'html.parser')
 news = soup.find_all('a', class_='tab-link-news')
 headlines = [n.text for n in news]
-
 if not headlines:
     headlines = ["冇新聞撈到，可能你打錯ticker，或者Finviz block你IP！"]
     sentiments = [0]
 else:
     sentiments = [TextBlob(h).sentiment.polarity for h in headlines]
-
 data = pd.DataFrame({'Headline': headlines, 'Sentiment': sentiments})
 
-# 畫Bar chart
+# Bar chart
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
 plt.axhline(y=0, color='black', linestyle='-')
@@ -37,7 +30,7 @@ plt.tight_layout()
 plt.savefig('sentiment_analysis.png')
 plt.close()
 
-# 畫Pie chart
+# Pie chart
 labels = ['正面', '中立', '負面']
 sizes = [
     sum([s > 0.1 for s in sentiments]),
@@ -51,13 +44,13 @@ plt.tight_layout()
 plt.savefig('sentiment_pie.png')
 plt.close()
 
-# 生成Table內容
+# Table內容
 table_rows = []
 for _, row in data.iterrows():
     table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]:.2f}</td></tr>')
 table_content = '\n'.join(table_rows)
 
-# 寫入index.html
+# index.html
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(f'''
 <!DOCTYPE html>
