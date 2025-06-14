@@ -2,11 +2,13 @@ import requests
 from bs4 import BeautifulSoup
 from textblob import TextBlob
 import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
 # 你揀邊隻股票呀大佬？改下面啦！
 ticker = "AAPL"  # 想睇Tesla？改做TSLA啦，不過小心比Musk玩謝你！
 
-# 去Finviz撈新聞，扮晒pro
+# 去Finviz撈新聞
 url = f"https://finviz.com/quote.ashx?t={ticker}&p=d"
 headers = {'User-Agent': 'Mozilla/5.0'}  # 扮browser，唔係會俾人ban
 response = requests.get(url, headers=headers)
@@ -27,7 +29,7 @@ data = pd.DataFrame({
     'Sentiment': sentiments
 })
 
-import matplotlib.pyplot as plt
+# 畫Bar chart
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(sentiments)), sentiments)
 plt.axhline(y=0, color='black', linestyle='-')
@@ -37,11 +39,26 @@ plt.ylabel('情緒分數')
 plt.savefig('sentiment_analysis.png')
 plt.close()  # 唔好彈個圖出嚟，直接save
 
+# 畫Pie chart，分分鐘笑到你噴飯
+labels = ['正面', '中立', '負面']
+sizes = [
+    sum([s > 0.1 for s in sentiments]),
+    sum([abs(s) <= 0.1 for s in sentiments]),
+    sum([s < -0.1 for s in sentiments])
+]
+plt.figure(figsize=(6,6))
+plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140)
+plt.title('新聞情緒分布')
+plt.savefig('sentiment_pie.png')
+plt.close()
+
+# 生成表格內容
 table_rows = []
 for _, row in data.iterrows():
     table_rows.append(f'<tr><td>{row["Headline"]}</td><td>{row["Sentiment"]}</td></tr>')
 table_content = '\n'.join(table_rows)
 
+# 寫入index.html
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(f'''
 <!DOCTYPE html>
@@ -63,6 +80,8 @@ with open('index.html', 'w', encoding='utf-8') as f:
     <h1>股票新聞情緒分析（串爆版）</h1>
     <p>睇清楚啦，唔好再問我點解輸錢！</p>
     <img src="sentiment_analysis.png" alt="情緒分析圖">
+    <h2>Pie Chart</h2>
+    <img src="sentiment_pie.png" alt="情緒分布餅圖">
     <p>（溫馨提示：呢個project唔包你發達，只包你型！）</p>
     <table>
         <thead>
@@ -75,7 +94,6 @@ with open('index.html', 'w', encoding='utf-8') as f:
             {table_content}
         </tbody>
     </table>
-    <p>GitHub Pages 型到震，你個friend睇到一定以為你係AI股神！</p>
 </body>
 </html>
     ''')
@@ -85,8 +103,6 @@ print("===== 你揀嘅股票新聞情緒分析 =====")
 print("睇清楚啦，唔好再問我點解輸錢！")
 print(data)
 print("\n（溫馨提示：呢個project唔包你發達，只包你型！）")
-
-
 
 print("===== 你揀嘅股票新聞情緒分析 =====")
 print("睇清楚啦，唔好再問我點解輸錢！")
